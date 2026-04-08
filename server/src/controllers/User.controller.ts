@@ -5,6 +5,10 @@ import jwt from "jsonwebtoken";
 import validator from "validator";
 import { sendEmail } from "../utils/email.js";
 import crypto from "crypto";
+import { OAuth2Client } from "google-auth-library";
+import axios from "axios";
+
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const signToken = (id: string): string => {
   return jwt.sign({ id }, process.env.JWT_SECRET!, {
@@ -86,7 +90,7 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
         if (process.env.NODE_ENV !== 'production') {
             return res.status(201).json({
                 status: "success",
-                message: "Signup successful, but email failed. (Dev Mode: Bypassing verification)",
+                message: "Signup successful, BUT EMAIL FAILED TO SEND. check your server console for errors.",
                 dev_error: err.message
             });
         }
@@ -145,6 +149,101 @@ export const verifyEmail = async (req: Request, res: Response): Promise<any> => 
     await user.save();
 
     res.status(200).json({ status: "success", message: "Email verified successfully!" });
+  } catch (error: any) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+export const googleLogin = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { credential, accessToken } = req.body;
+
+    let email, name, googleId;
+
+    if (credential) {
+      const ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+      });
+      const payload = ticket.getPayload();
+      if (!payload) return res.status(400).json({ status: "fail", message: "Invalid Google token" });
+      email = payload.email;
+      name = payload.name;
+      googleId = payload.sub;
+    } else if (accessToken) {
+      const { data } = await axios.get(`https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`);
+      email = data.email;
+      name = data.name;
+      googleId = data.sub;
+    } else {
+      return res.status(400).json({ status: "fail", message: "Google credential or access token is required" });
+    }
+
+    if (!email) {
+      return res.status(400).json({ status: "fail", message: "Email not provided by Google" });
+    }
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      // Update googleId if not present
+      if (!user.googleId) {
+        user.googleId = googleId;
+        user.isVerified = true; // Google users are verified
+        await user.save();
+      }
+    } else {
+      // Create new user
+      user = await User.create({
+        name,
+        email,
+        googleId,
+        isVerified: true,
+      });
+    }
+
+    createSendToken(user, 200, res);
+  } catch (error: any) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+export const facebookLogin = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { accessToken } = req.body;
+
+    if (!accessToken) {
+      return res.status(400).json({ status: "fail", message: "Facebook access token is required" });
+    }
+
+    const { data } = await axios.get(
+      `https://graph.facebook.com/me?fields=id,name,email&access_token=${accessToken}`
+    );
+
+    if (!data || !data.email) {
+      return res.status(400).json({ status: "fail", message: "Invalid Facebook token or email missing" });
+    }
+
+    const { email, name, id: facebookId } = data;
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+      if (!user.facebookId) {
+        user.facebookId = facebookId;
+        user.isVerified = true;
+        await user.save();
+      }
+    } else {
+      user = await User.create({
+        name,
+        email,
+        facebookId,
+        isVerified: true,
+      });
+    }
+
+    createSendToken(user, 200, res);
   } catch (error: any) {
     res.status(500).json({ status: "error", message: error.message });
   }

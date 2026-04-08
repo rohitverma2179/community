@@ -25,3 +25,27 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
+
+export const googleLogin = createAsyncThunk(
+  "user/googleLogin",
+  async (accessToken: string, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post("/users/google-login", { accessToken });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Google Login failed");
+    }
+  }
+);
+
+export const facebookLogin = createAsyncThunk(
+  "user/facebookLogin",
+  async (accessToken: string, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post("/users/facebook-login", { accessToken });
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Facebook Login failed");
+    }
+  }
+);

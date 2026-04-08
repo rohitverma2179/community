@@ -1,9 +1,10 @@
 import mongoose from "mongoose";
 
 const connectDB = async (): Promise<void> => {
-  const uri = process.env.MONGO_URI || process.env.DATABASE_URL;
+  // const uri = process.env.MONGO_URI || process.env.DATABASE_URL;
+  const uri = process.env.MONGO_URI ;
   if (!uri) {
-    console.error("❌ DB Error: MONGO_URI or DATABASE_URL not defined in .env");
+    console.error("❌ DB Error: MONGO_URI or DATABASE_URL not defined in .env");  
     process.exit(1);
   }
 

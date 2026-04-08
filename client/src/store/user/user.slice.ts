@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { signupUser, loginUser } from "./user.thunk";
+import { signupUser, loginUser, googleLogin, facebookLogin } from "./user.thunk";
 
 interface UserState {
   user: any | null;
@@ -27,34 +27,43 @@ const userSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Signup
+    // Helper to handle loading/success/error
+    const handleAuthCases = (thunk: any) => {
+      builder
+        .addCase(thunk.pending, (state) => {
+          state.isLoading = true;
+          state.error = null;
+        })
+        .addCase(thunk.fulfilled, (state, action) => {
+          state.isLoading = false;
+          state.user = action.payload.data?.user || action.payload.user;
+          state.success = true;
+        })
+        .addCase(thunk.rejected, (state, action) => {
+          state.isLoading = false;
+          state.error = action.payload as string;
+        });
+    };
+
+    // Traditional Auth
     builder
       .addCase(signupUser.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(signupUser.fulfilled, (state, action) => {
+      .addCase(signupUser.fulfilled, (state) => {
         state.isLoading = false;
         state.success = true;
       })
       .addCase(signupUser.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
-      })
-      // Login
-      .addCase(loginUser.pending, (state) => {
-        state.isLoading = true;
-        state.error = null;
-      })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.user = action.payload.data.user;
-        state.success = true;
-      })
-      .addCase(loginUser.rejected, (state, action) => {
-        state.isLoading = false;
-        state.error = action.payload as string;
       });
+
+    // Login handlers
+    handleAuthCases(loginUser);
+    handleAuthCases(googleLogin);
+    handleAuthCases(facebookLogin);
   },
 });
 

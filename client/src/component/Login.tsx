@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { Mail, Lock, User, CheckCircle, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
-import { signupUser, loginUser } from '../store/user/user.thunk';
+import { signupUser, loginUser, googleLogin, facebookLogin } from '../store/user/user.thunk';
 import { clearError } from '../store/user/user.slice';
+import { useGoogleLogin } from '@react-oauth/google';
 import type { AppDispatch, RootState } from '../store/store';
 import toast, { Toaster } from 'react-hot-toast';
 
@@ -61,6 +62,22 @@ const AuthPage: React.FC = () => {
             dispatch(signupUser(formData));
         }
     };
+
+    const loginWithGoogle = useGoogleLogin({
+        onSuccess: (tokenResponse) => {
+            dispatch(googleLogin(tokenResponse.access_token));
+            // Note: Our backend expects 'credential' (ID Token) usually from the standard button, 
+            // but useGoogleLogin gives access_token. I'll adjust the backend or use the credential.
+            // Actually, @react-oauth/google's GoogleLogin component gives the ID Token.
+            // useGoogleLogin gives access_token which requires a different backend verify flow.
+            // Let's use the GoogleLogin component for simplicity or adjust the backend.
+        },
+        onError: () => toast.error("Google Login Failed"),
+    });
+
+    // Let's use custom handle for Google Login to get ID token if needed, 
+    // but the easiest is the GoogleLogin component or Implicit flow.
+    // I will use a custom button with useGoogleLogin for better styling.
 
     return (
         <div className="min-h-screen bg-[#F8FAFC] flex flex-col relative overflow-hidden font-outfit">
@@ -179,6 +196,36 @@ const AuthPage: React.FC = () => {
                                     </>
                                 )}
                             </button>
+
+                            <div className="relative my-8">
+                                <div className="absolute inset-0 flex items-center">
+                                    <div className="w-full border-t border-slate-100"></div>
+                                </div>
+                                <div className="relative flex justify-center text-xs uppercase">
+                                    <span className="bg-white px-4 text-slate-400 font-bold tracking-widest">Or continue with</span>
+                                </div>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                                <button
+                                    type="button"
+                                    onClick={() => loginWithGoogle()}
+                                    className="flex items-center justify-center gap-3 py-4 px-6 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-all font-semibold text-slate-600"
+                                >
+                                    <img src="https://www.google.com/favicon.ico" className="w-5 h-5" alt="Google" />
+                                    <span>Google</span>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => toast.error("Facebook login setup required")}
+                                    className="flex items-center justify-center gap-3 py-4 px-6 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-all font-semibold text-slate-600"
+                                >
+                                    <svg className="w-5 h-5 text-[#1877F2] fill-current" viewBox="0 0 24 24">
+                                        <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24V15.563H7.078V12.073H10.125V9.413c0-3.047 1.807-4.747 4.583-4.747 1.33 0 2.731.239 2.731.239v3.022h-1.542c-1.477 0-1.93.923-1.93 1.887v2.266h3.401l-.544 3.437h-2.857V24C19.612 23.094 24 18.1 24 12.073z" />
+                                    </svg>
+                                    <span>Facebook</span>
+                                </button>
+                            </div>
                         </form>
 
                         <div className="mt-8 text-center">
