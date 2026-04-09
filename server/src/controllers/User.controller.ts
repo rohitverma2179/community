@@ -86,14 +86,14 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
         message: "Signup successful! Check your email to verify your account.",
       });
     } catch (err: any) {
-        // ✅ FIX for 500 Error: If email fail, don't crash. Still allow signup in Dev mode.
-        if (process.env.NODE_ENV !== 'production') {
-            return res.status(201).json({
-                status: "success",
-                message: "Signup successful, BUT EMAIL FAILED TO SEND. check your server console for errors.",
-                dev_error: err.message
-            });
-        }
+      // ✅ FIX for 500 Error: If email fail, don't crash. Still allow signup in Dev mode.
+      if (process.env.NODE_ENV !== 'production') {
+        return res.status(201).json({
+          status: "success",
+          message: "Signup successful, BUT EMAIL FAILED TO SEND. check your server console for errors.",
+          dev_error: err.message
+        });
+      }
       await User.findByIdAndDelete(newUser._id);
       return res.status(500).json({ status: "error", message: "Error sending verification email. Try again." });
     }
@@ -189,7 +189,7 @@ export const googleLogin = async (req: Request, res: Response): Promise<any> => 
       // Update googleId if not present
       if (!user.googleId) {
         user.googleId = googleId;
-        user.isVerified = true; // Google users are verified
+        user.isVerified = true;
         await user.save();
       }
     } else {
@@ -204,7 +204,11 @@ export const googleLogin = async (req: Request, res: Response): Promise<any> => 
 
     createSendToken(user, 200, res);
   } catch (error: any) {
-    res.status(500).json({ status: "error", message: error.message });
+    console.error("Google Login Error:", error.response?.data || error.message);
+    res.status(500).json({ 
+      status: "error", 
+      message: error.response?.data?.error_description || error.message || "Google Login failed" 
+    });
   }
 };
 
@@ -247,4 +251,24 @@ export const facebookLogin = async (req: Request, res: Response): Promise<any> =
   } catch (error: any) {
     res.status(500).json({ status: "error", message: error.message });
   }
+};
+
+export const getMe = async (req: any, res: Response): Promise<any> => {
+  try {
+    const user = await User.findById(req.user.id);
+    res.status(200).json({
+      status: "success",
+      data: { user },
+    });
+  } catch (error: any) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+export const logout = (req: Request, res: Response) => {
+  res.cookie("jwt", "loggedout", {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true,
+  });
+  res.status(200).json({ status: "success" });
 };

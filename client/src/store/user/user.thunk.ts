@@ -49,3 +49,27 @@ export const facebookLogin = createAsyncThunk(
     }
   }
 );
+
+export const getMe = createAsyncThunk(
+  "user/getMe",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get("/users/me");
+      return response.data;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Session expired");
+    }
+  }
+);
+
+export const logoutUser = createAsyncThunk(
+  "user/logout",
+  async (_, { rejectWithValue }) => {
+    try {
+      await axiosInstance.get("/users/logout");
+      return null;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || "Logout failed");
+    }
+  }
+);

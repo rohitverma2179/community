@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { signupUser, loginUser, googleLogin, facebookLogin } from "./user.thunk";
+import { signupUser, loginUser, googleLogin, facebookLogin, getMe, logoutUser } from "./user.thunk";
 
 interface UserState {
   user: any | null;
@@ -64,6 +64,12 @@ const userSlice = createSlice({
     handleAuthCases(loginUser);
     handleAuthCases(googleLogin);
     handleAuthCases(facebookLogin);
+    handleAuthCases(getMe);
+
+    builder.addCase(logoutUser.fulfilled, (state) => {
+      state.user = null;
+      state.success = false;
+    });
   },
 });
 
