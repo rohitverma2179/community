@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Mail, Lock, User, CheckCircle, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { signupUser, loginUser, googleLogin, facebookLogin } from '../store/user/user.thunk';
-import { clearError } from '../store/user/user.slice';
+import { clearError, resetSuccess } from '../store/user/user.slice';
 import { useGoogleLogin } from '@react-oauth/google';
 import type { AppDispatch, RootState } from '../store/store';
 import toast, { Toaster } from 'react-hot-toast';
@@ -19,6 +20,7 @@ const AuthPage: React.FC = () => {
     });
 
     const dispatch = useDispatch<AppDispatch>();
+    const navigate = useNavigate();
     const { isLoading, error, success } = useSelector((state: RootState) => state.user);
 
     const toggleAuth = () => {
@@ -32,9 +34,16 @@ const AuthPage: React.FC = () => {
             dispatch(clearError());
         }
         if (success) {
-            toast.success(isLogin ? "Logged in successfully!" : "Verification email sent!");
+            toast.success(isLogin ? "Logged in successfully!" : "OTP sent to your email!");
+            if (!isLogin) {
+                navigate('/verify-otp', { state: { email: formData.email } });
+            }
+            const timer = setTimeout(() => {
+                dispatch(resetSuccess());
+            }, 3000);
+            return () => clearTimeout(timer);
         }
-    }, [error, success, isLogin, dispatch]);
+    }, [error, success, isLogin, dispatch, navigate, formData.email]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });

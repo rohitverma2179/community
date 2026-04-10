@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { X, Image as ImageIcon, Send, Loader2, AlertCircle } from 'lucide-react';
+import { X, Image as ImageIcon, Send, Loader2, AlertCircle, FileText, Video as VideoIcon, Film } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import type { AppDispatch } from '../store/store';
 import { createPost } from '../store/post/post.slice';
@@ -12,18 +12,19 @@ interface PostModalProps {
 
 const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
   const [content, setContent] = useState('');
-  const [imageUrl, setImageUrl] = useState('');
+  const [media, setMedia] = useState<{ url: string; type: 'image' | 'video' | 'pdf' | 'gif' } | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isPosting, setIsPosting] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadType, setUploadType] = useState<'image' | 'video' | 'pdf' | 'gif'>('image');
   const dispatch = useDispatch<AppDispatch>();
 
-  // Cloudinary Config (Signed Upload using provided credentials)
+  // Cloudinary Config
   const CLOUDINARY_API_KEY = '517894626762537';
   const CLOUDINARY_API_SECRET = 'rXm8MYjTJu1JDrz87vnBeCFsqAE';
   const CLOUDINARY_CLOUD_NAME = 'diwsdon3e';
 
-  // Helper to generate SHA-1 signature for Cloudinary
   const generateSignature = async (timestamp: number) => {
     const stringToSign = `timestamp=${timestamp}${CLOUDINARY_API_SECRET}`;
     const msgBuffer = new TextEncoder().encode(stringToSign);
@@ -32,14 +33,14 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
     return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // 700KB limit check
-    const maxSizeInBytes = 700 * 1024;
-    if (file.size > maxSizeInBytes) {
-      setError('File too large (Max 700KB)');
+    // Adjusted limits: Images/PDFs 2MB, Videos 10MB
+    const limit = uploadType === 'video' ? 10 * 1024 * 1024 : 2 * 1024 * 1024;
+    if (file.size > limit) {
+      setError(`File too large (Max ${uploadType === 'video' ? '10MB' : '2MB'})`);
       setTimeout(() => setError(''), 4000);
       return;
     }
@@ -56,8 +57,13 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
       formData.append('api_key', CLOUDINARY_API_KEY);
       formData.append('timestamp', timestamp.toString());
       formData.append('signature', signature);
+      
+      // Determine Cloudinary resource_type
+      let resourceType = 'image';
+      if (uploadType === 'video') resourceType = 'video';
+      if (uploadType === 'pdf') resourceType = 'auto'; // auto handles raw/pdf
 
-      const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, {
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`, {
         method: 'POST',
         body: formData,
       });
@@ -65,35 +71,51 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
       const data = await response.json();
       
       if (data.secure_url) {
-        setImageUrl(data.secure_url);
+        setMedia({ url: data.secure_url, type: uploadType });
         setError('');
       } else {
-        console.error('Cloudinary Error Data:', data);
-        setError(data.error?.message || 'Upload failed. Check console.');
+        setError(data.error?.message || 'Upload failed');
       }
     } catch (err) {
-      setError('Error uploading image. Please check your internet connection.');
-      console.error('Fetch Error:', err);
+      setError('Error uploading. Please check connection.');
     } finally {
       setIsUploading(false);
-      // Reset input so the same file can be selected again if removed
       if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const triggerUpload = (type: 'image' | 'video' | 'pdf' | 'gif') => {
+    setUploadType(type);
+    if (fileInputRef.current) {
+      // Set accept string based on type
+      let accept = 'image/*';
+      if (type === 'video') accept = 'video/*';
+      if (type === 'pdf') accept = '.pdf';
+      if (type === 'gif') accept = 'image/gif';
+      fileInputRef.current.accept = accept;
+      fileInputRef.current.click();
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!content.trim() || isUploading) return;
-
-    await dispatch(createPost({ 
-      content, 
-      images: imageUrl ? [imageUrl] : [] 
-    }));
-    
-    setContent('');
-    setImageUrl('');
-    setError('');
-    onClose();
+    if (!content.trim() || isUploading || isPosting) return;
+    setIsPosting(true);
+    try {
+      await dispatch(createPost({ 
+        content, 
+        images: media ? [media.url] : [],
+        mediaType: media?.type || 'image'
+      } as any)).unwrap();
+      
+      setContent('');
+      setMedia(null);
+      onClose();
+    } catch (err: any) {
+      setError('Failed to create post');
+    } finally {
+      setIsPosting(false);
+    }
   };
 
   return (
@@ -129,12 +151,21 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
                 autoFocus
               />
 
-              {imageUrl && (
-                <div className="mt-4 relative group">
-                  <img src={imageUrl} alt="Upload preview" className="w-full h-48 object-cover rounded-2xl border border-[#333]" />
+              {media && (
+                <div className="mt-4 relative group rounded-2xl overflow-hidden border border-[#333] bg-[#0a0a0a]">
+                  {media.type === 'video' ? (
+                    <video src={media.url} controls className="w-full h-48 object-cover" />
+                  ) : media.type === 'pdf' ? (
+                    <div className="p-8 flex flex-col items-center justify-center gap-3">
+                       <FileText size={48} className="text-blue-500" />
+                       <span className="text-sm font-bold truncate max-w-full px-4">{media.url.split('/').pop()}</span>
+                    </div>
+                  ) : (
+                    <img src={media.url} alt="Preview" className="w-full h-48 object-cover" />
+                  )}
                   <button 
                     type="button"
-                    onClick={() => setImageUrl('')}
+                    onClick={() => setMedia(null)}
                     className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-black/70 rounded-full transition-all"
                   >
                     <X size={16} />
@@ -143,42 +174,49 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
               )}
 
               {error && (
-                <motion.div 
-                  initial={{ opacity: 0, x: 10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="mt-4 flex items-center gap-2 text-rose-500 text-xs font-bold bg-rose-500/10 p-3 rounded-xl border border-rose-500/20"
-                >
+                <div className="mt-4 flex items-center gap-2 text-rose-500 text-xs font-bold bg-rose-500/10 p-3 rounded-xl border border-rose-500/20">
                   <AlertCircle size={14} />
                   {error}
-                </motion.div>
+                </div>
               )}
 
               <input 
                 type="file" 
                 ref={fileInputRef}
-                onChange={handleImageUpload}
+                onChange={handleFileUpload}
                 className="hidden" 
-                accept="image/*"
               />
 
-              <div className="mt-8 flex items-center justify-between">
-                <div className="flex gap-2">
-                  <button 
-                    type="button" 
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={isUploading}
-                    className="flex items-center gap-2 text-blue-500 hover:bg-blue-500/10 px-4 py-2 rounded-xl transition-colors font-semibold text-sm disabled:opacity-50"
-                  >
-                    {isUploading ? <Loader2 size={20} className="animate-spin" /> : <ImageIcon size={20} />}
-                    {isUploading ? 'Uploading...' : 'Add Image'}
-                  </button>
+              <div className="mt-8 flex flex-col gap-6">
+                <div className="flex border-t border-[#222] pt-4 items-center justify-between">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-widest">Add Media</span>
+                  <div className="flex gap-1">
+                    {[
+                      { icon: <ImageIcon size={20} />, label: 'Image', type: 'image' },
+                      { icon: <Film size={20} />, label: 'GIF', type: 'gif' },
+                      { icon: <VideoIcon size={20} />, label: 'Video', type: 'video' },
+                      { icon: <FileText size={20} />, label: 'PDF', type: 'pdf' }
+                    ].map((btn) => (
+                      <button 
+                        key={btn.type}
+                        type="button" 
+                        onClick={() => triggerUpload(btn.type as any)}
+                        disabled={isUploading}
+                        title={btn.label}
+                        className={`p-3 rounded-xl transition-all ${uploadType === btn.type && media ? 'bg-blue-600 text-white' : 'text-gray-400 hover:bg-[#2a2a2a] hover:text-white'}`}
+                      >
+                        {isUploading && uploadType === btn.type ? <Loader2 size={20} className="animate-spin" /> : btn.icon}
+                      </button>
+                    ))}
+                  </div>
                 </div>
+
                 <button 
-                  disabled={!content.trim() || isUploading}
-                  className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:hover:bg-blue-600 text-white px-6 py-2.5 rounded-xl font-bold flex items-center gap-2 transition-all shadow-lg shadow-blue-500/20"
+                  disabled={!content.trim() || isUploading || isPosting}
+                  className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-3 transition-all shadow-xl shadow-blue-500/20"
                 >
-                  <Send size={18} />
-                  Post
+                  {isPosting ? <Loader2 size={20} className="animate-spin" /> : <Send size={20} />}
+                  <span>{isPosting ? 'Posting...' : 'Create Post'}</span>
                 </button>
               </div>
             </form>
@@ -190,5 +228,3 @@ const PostModal: React.FC<PostModalProps> = ({ isOpen, onClose }) => {
 };
 
 export default PostModal;
-
-

@@ -205,9 +205,9 @@ export const googleLogin = async (req: Request, res: Response): Promise<any> => 
     createSendToken(user, 200, res);
   } catch (error: any) {
     console.error("Google Login Error:", error.response?.data || error.message);
-    res.status(500).json({ 
-      status: "error", 
-      message: error.response?.data?.error_description || error.message || "Google Login failed" 
+    res.status(500).json({
+      status: "error",
+      message: error.response?.data?.error_description || error.message || "Google Login failed"
     });
   }
 };

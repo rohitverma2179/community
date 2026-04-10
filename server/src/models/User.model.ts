@@ -8,8 +8,8 @@ export interface IUser extends Document {
   googleId?: string;
   facebookId?: string;
   isVerified: boolean;
-  verificationToken?: string;
-  verificationTokenExpires?: Date;
+  otp?: string;
+  otpExpires?: Date;
   comparePassword: (password: string) => Promise<boolean>;
 }
 
@@ -21,8 +21,8 @@ const userSchema = new Schema<IUser>(
     googleId: { type: String, unique: true, sparse: true },
     facebookId: { type: String, unique: true, sparse: true },
     isVerified: { type: Boolean, default: false },
-    verificationToken: String,
-    verificationTokenExpires: Date,
+    otp: String,
+    otpExpires: Date,
   },
   { timestamps: true }
 );

@@ -8,14 +8,26 @@ export const fetchPosts = createAsyncThunk('post/fetchPosts', async () => {
   return response.data.data.posts;
 });
 
-export const createPost = createAsyncThunk('post/createPost', async (postData: { content: string; images?: string[] }) => {
-  const response = await axios.post(API_URL, postData, { withCredentials: true });
-  return response.data.data.post;
-});
+export const createPost = createAsyncThunk(
+  'post/createPost',
+  async (postData: { content: string; images?: string[] }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(API_URL, postData, { withCredentials: true });
+      return response.data.data.post;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to create post');
+    }
+  }
+);
 
 export const fetchUserPosts = createAsyncThunk('post/fetchUserPosts', async (userId: string) => {
   const response = await axios.get(`${API_URL}/user/${userId}`);
   return response.data.data.posts;
+});
+
+export const fetchPostById = createAsyncThunk('post/fetchPostById', async (postId: string) => {
+  const response = await axios.get(`${API_URL}/${postId}`);
+  return response.data.data.post;
 });
 
 interface PostState {
@@ -44,7 +56,10 @@ const postSlice = createSlice({
   initialState,
   reducers: {
     addPostToFeed: (state, action: PayloadAction<any>) => {
-      state.posts.unshift(action.payload);
+      const exists = state.posts.some(p => p._id === action.payload._id);
+      if (!exists) {
+        state.posts.unshift(action.payload);
+      }
     },
     setPostModalOpen: (state, action: PayloadAction<boolean>) => {
       state.isPostModalOpen = action.payload;
@@ -62,7 +77,10 @@ const postSlice = createSlice({
         state.error = action.error.message || 'Failed to fetch posts';
       })
       .addCase(createPost.fulfilled, (state, action) => {
-        state.posts.unshift(action.payload);
+        const exists = state.posts.some(p => p._id === action.payload._id);
+        if (!exists) {
+          state.posts.unshift(action.payload);
+        }
         state.isPostModalOpen = false;
       })
       .addCase(fetchUserPosts.fulfilled, (state, action) => {

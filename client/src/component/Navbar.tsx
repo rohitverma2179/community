@@ -2,18 +2,22 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
 import { Search, User as UserIcon, Home, Flame, Newspaper, Briefcase, Plus, SignalLow } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import { setPostModalOpen } from '../store/post/post.slice';
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { logoutUser } from '../store/user/user.thunk';
+import logo from '../assets/eGrowth 4.svg';
 
 const Navbar: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.user);
-  const dispatch = useDispatch<AppDispatch>();
+  const dispatch = useDispatch <AppDispatch>();
   const navigate = useNavigate();
+  const location = useLocation();
   const [isHovered, setIsHovered] = React.useState(false);
+
+  const isHome = location.pathname === '/';
 
   const handlePostClick = () => {
     if (!user) {
@@ -33,8 +37,9 @@ const Navbar: React.FC = () => {
       <div className="max-w-7xl mx-auto w-full flex items-center px-4">
         {/* Brand/Logo */}
         <div className="flex items-center gap-6">
-          <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-            <SignalLow className="text-white rotate-90" size={24} />
+          <div className="w-10 h-10 bg-gradient-to-br  flex items-center justify-center ">
+            {/* <SignalLow className="text-white rotate-90" size={24} /> */}
+            <img src={logo} alt="Logo" />
           </div>
         </div>
 
@@ -65,14 +70,15 @@ const Navbar: React.FC = () => {
             <Search className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-600" size={18} />
           </div>
 
-          <button 
-            onClick={handlePostClick}
-            className="bg-[#38bdf8] hover:bg-[#0ea5e9] text-black px-6 py-2.5 rounded-full font-bold flex items-center gap-2 transition-all whitespace-nowrap hidden sm:flex"
-          >
-            <span>Post</span>
-            <Plus size={20} />
-          </button>
-
+          {isHome && (
+            <button 
+              onClick={handlePostClick}
+              className="bg-[#38bdf8] hover:bg-[#0ea5e9] text-black px-6 py-2.5 rounded-full font-bold flex items-center gap-2 transition-all whitespace-nowrap hidden sm:flex"
+            >
+              <span>Post</span>
+              <Plus size={20} />
+            </button>
+          )}
 
           {!user ? (
             <div className="flex items-center gap-3 ml-2">
@@ -127,7 +133,7 @@ const Navbar: React.FC = () => {
                       onClick={handleLogout}
                       className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-rose-500 hover:bg-rose-500/10 transition-all"
                     >
-                      <SignalLow className="rotate-180" size={16} />
+                      {/* <SignalLow className="rotate-180" size={16} /> */}
                       Log Out
                     </button>
                   </motion.div>
@@ -140,8 +146,5 @@ const Navbar: React.FC = () => {
     </nav>
   );
 };
-
-
-
 
 export default Navbar;

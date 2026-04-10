@@ -5,7 +5,7 @@ import { getIO } from "../utils/socket.js";
 
 export const createPost = async (req: AuthRequest, res: Response): Promise<any> => {
   try {
-    const { content, images } = req.body;
+    const { content, images, mediaType } = req.body;
 
     if (!content) {
       return res.status(400).json({ status: "fail", message: "Post content is required" });
@@ -15,6 +15,7 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<any> 
       user: req.user._id,
       content,
       images: images || [],
+      mediaType: mediaType || 'image'
     });
 
     const populatedPost = await newPost.populate("user", "name email");
@@ -26,6 +27,24 @@ export const createPost = async (req: AuthRequest, res: Response): Promise<any> 
     res.status(201).json({
       status: "success",
       data: { post: populatedPost },
+    });
+  } catch (error: any) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+export const getPostById = async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { postId } = req.params;
+    const post = await Post.findById(postId).populate("user", "name email");
+
+    if (!post) {
+      return res.status(404).json({ status: "fail", message: "Post not found" });
+    }
+
+    res.status(200).json({
+      status: "success",
+      data: { post },
     });
   } catch (error: any) {
     res.status(500).json({ status: "error", message: error.message });

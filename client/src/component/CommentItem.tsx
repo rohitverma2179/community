@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, Heart } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, CornerDownRight } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { AppDispatch, RootState } from '../store/store';
 import { addComment, likeComment } from '../store/comment/comment.slice';
@@ -8,10 +8,12 @@ import { useNavigate } from 'react-router-dom';
 interface CommentItemProps {
   comment: any;
   postId: string;
+  depth?: number;
 }
 
-const CommentItem: React.FC<CommentItemProps> = ({ comment, postId }) => {
+const CommentItem: React.FC<CommentItemProps> = ({ comment, postId, depth = 0 }) => {
   const [showReplyInput, setShowReplyInput] = useState(false);
+  const [showReplies, setShowReplies] = useState(false);
   const [replyText, setReplyText] = useState('');
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
@@ -35,6 +37,7 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, postId }) => {
 
     setReplyText('');
     setShowReplyInput(false);
+    setShowReplies(true);
   };
 
   const handleLikeComment = (e: React.MouseEvent) => {
@@ -47,60 +50,115 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, postId }) => {
   };
 
   return (
-    <div className="group">
-      <div className="flex gap-4">
-        <div className="w-8 h-8 rounded-full bg-gray-700 flex-shrink-0 flex items-center justify-center text-xs font-bold ring-2 ring-[#333]">
-          {comment.user?.name?.[0] || '?'}
-        </div>
-        <div className="flex-1">
-          <div className="bg-[#2a2a2a] p-3 rounded-2xl rounded-tl-none border border-[#333] transition-colors group-hover:border-[#444]">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs font-bold text-gray-300">{comment.user?.name || 'Unknown User'}</span>
-              <span className="text-[10px] text-gray-500">{new Date(comment.createdAt).toLocaleTimeString()}</span>
-            </div>
-            <p className="text-sm text-gray-200 leading-relaxed">{comment.content}</p>
-          </div>
+    <div className="relative group">
+      {/* Visual Threading Line (Vertical) */}
+      {depth > 0 && (
+         <div className="absolute left-[-22px] top-[-16px] bottom-0 w-[1.5px] bg-[#3f3f3f] group-last:bottom-auto group-last:h-8" />
+      )}
+      
+      {/* Visual Threading Hook (Horizontal) */}
+      {depth > 0 && (
+         <div className="absolute left-[-22px] top-4 w-4 h-5 border-l-[1.5px] border-b-[1.5px] border-[#3f3f3f] rounded-bl-xl" />
+      )}
 
-          {/* Comment Actions */}
-          <div className="flex items-center gap-4 mt-2 ml-1">
-            <button 
-              onClick={handleLikeComment}
-              className={`flex items-center gap-1.5 text-xs transition-colors font-semibold ${isLiked ? 'text-rose-500' : 'text-gray-500 hover:text-blue-500'}`}
-            >
-              <Heart size={14} fill={isLiked ? 'currentColor' : 'none'} />
-              {comment.likes?.length || 0} Likes
+      <div className={`flex gap-3 ${depth > 0 ? 'mt-3 pl-3' : 'mt-6'}`}>
+        {/* Avatar */}
+        <div className="flex-shrink-0 relative z-10">
+          <div className={`${depth > 0 ? 'w-6 h-6' : 'w-10 h-10'} rounded-full bg-[#1a1a1a] border border-[#333] flex items-center justify-center text-xs font-bold text-gray-400 overflow-hidden`}>
+            {comment.user?.avatar ? (
+               <img src={comment.user.avatar} alt="" className="w-full h-full object-cover" />
+            ) : (
+                comment.user?.name?.[0] || '?'
+            )}
+          </div>
+        </div>
+
+        {/* Content Section */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-0.5">
+            <span className={`font-bold text-gray-100 ${depth > 0 ? 'text-[11px]' : 'text-[13px]'}`}>
+               @{comment.user?.name?.toLowerCase().replace(/\s/g, '') || 'user'}
+            </span>
+            <span className="text-[11px] text-gray-500">{new Date(comment.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          </div>
+          
+          <p className={`${depth > 0 ? 'text-[13px]' : 'text-[14px]'} text-gray-300 leading-normal mb-1`}>
+            {comment.content}
+          </p>
+
+          {/* Action Buttons */}
+          <div className="flex items-center gap-5 mt-1">
+            <div className="flex items-center gap-1.5 min-w-[24px]">
+              <button 
+                onClick={handleLikeComment}
+                className={`p-1 hover:bg-[#2a2a2a] rounded-full transition-colors ${isLiked ? 'text-white' : 'text-gray-400'}`}
+              >
+                <ThumbsUp size={depth > 0 ? 12 : 14} fill={isLiked ? 'currentColor' : 'none'} />
+              </button>
+              <span className="text-[11px] text-gray-500">{comment.likes?.length || 0}</span>
+            </div>
+
+            <button className="p-1 hover:bg-[#2a2a2a] rounded-full text-gray-400">
+               <ThumbsDown size={depth > 0 ? 12 : 14} />
             </button>
+            
             <button
               onClick={() => setShowReplyInput(!showReplyInput)}
-              className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-blue-500 transition-colors font-semibold"
+              className="text-[11px] font-bold text-gray-400 hover:bg-[#2a2a2a] px-3 py-1 rounded-full transition-all"
             >
-              <MessageSquare size={14} />
               Reply
             </button>
           </div>
 
+          {/* Reply Input Form */}
           {showReplyInput && (
-            <form onSubmit={handleReply} className="mt-3 flex gap-2">
+            <form onSubmit={handleReply} className="mt-3 flex flex-col gap-2 max-w-xl">
               <input
                 value={replyText}
                 onChange={(e) => setReplyText(e.target.value)}
-                placeholder={`Replying to ${comment.user?.name}...`}
-                className="flex-1 bg-[#222] border border-[#333] rounded-xl px-4 py-2 text-xs outline-none focus:border-blue-500 transition-all"
+                placeholder="Add a reply..."
+                className="w-full bg-transparent border-b border-[#3f3f3f] py-1 text-sm outline-none focus:border-white transition-all text-gray-200"
                 autoFocus
               />
-              <button className="bg-blue-600 px-3 py-1 rounded-lg text-xs font-bold hover:bg-blue-500 transition-colors">Post</button>
+              <div className="flex justify-end gap-2">
+                 <button type="button" onClick={() => setShowReplyInput(false)} className="text-xs font-bold text-gray-400 px-3 py-1.5 hover:bg-[#2a2a2a] rounded-full">Cancel</button>
+                 <button type="submit" className="bg-[#3ea6ff] text-black px-4 py-1.5 rounded-full text-xs font-bold hover:bg-[#65b8ff] disabled:opacity-50" disabled={!replyText.trim()}>Reply</button>
+              </div>
             </form>
           )}
 
-          {/* Nested Replies */}
-          {comment.repliesData && comment.repliesData.length > 0 && (
-            <div className="mt-4 space-y-4 border-l-2 border-[#2a2a2a]/50 pl-6 ml-1">
-              {comment.repliesData.map((reply: any) => (
-                <div key={reply._id} className="relative">
-                  <div className="absolute -left-6 top-6 w-4 h-0.5 bg-[#2a2a2a]/50"></div>
-                  <CommentItem comment={reply} postId={postId} />
-                </div>
-              ))}
+          {/* YouTube Style Nested Replies Toggle */}
+          {comment.repliesData && comment.repliesData.length > 0 && !showReplies && (
+             <button 
+               onClick={() => setShowReplies(true)}
+               className="mt-2 text-[#3ea6ff] text-[13px] font-bold hover:bg-[#3ea6ff]/10 px-3 py-1.5 rounded-full flex items-center gap-2"
+             >
+               <CornerDownRight size={14} />
+               {comment.repliesData.length} {comment.repliesData.length === 1 ? 'reply' : 'replies'}
+             </button>
+          )}
+
+          {/* Actual Nested Replies */}
+          {showReplies && (
+            <div className={`mt-1 border-stone-800 ${depth === 0 ? 'ml-2 md:ml-6' : 'ml-0'}`}>
+              <div className="space-y-0">
+                {comment.repliesData.map((reply: any) => (
+                   <CommentItem 
+                    key={reply._id} 
+                    comment={reply} 
+                    postId={postId} 
+                    depth={depth + 1} 
+                  />
+                ))}
+              </div>
+              {depth === 0 && (
+                <button 
+                  onClick={() => setShowReplies(false)}
+                  className="mt-2 text-[#3ea6ff] text-[13px] font-bold hover:bg-[#3ea6ff]/10 px-3 py-1.5 rounded-full"
+                >
+                  Hide replies
+                </button>
+              )}
             </div>
           )}
         </div>
@@ -108,6 +166,5 @@ const CommentItem: React.FC<CommentItemProps> = ({ comment, postId }) => {
     </div>
   );
 };
-
 
 export default CommentItem;
