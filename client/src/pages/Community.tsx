@@ -13,6 +13,7 @@ const Community: React.FC = () => {
   useEffect(() => {
     dispatch(fetchPosts());
 
+    
     // Socket listeners
     socket.on('newPost', (post) => {
       dispatch(addPostToFeed(post));
