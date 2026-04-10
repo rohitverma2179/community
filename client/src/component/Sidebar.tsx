@@ -1,5 +1,5 @@
 import React from 'react';
-import { Globe, Star, Home, ChevronDown, ChevronRight, FileText, Image, FileSpreadsheet } from 'lucide-react';
+import { Globe, ChevronDown, ChevronRight, FileText, Image, FileSpreadsheet } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
   const domains = [
@@ -10,7 +10,6 @@ const Sidebar: React.FC = () => {
     'EGS and Sustainability Services',
     'Quality & Business Excellence'
   ];
-  const resources = ['Documentation', 'Course Material', 'Asset Library', 'Video Tutorials'];
 
   return (
     <aside className="w-64 hidden lg:flex flex-col gap-4 sticky top-20 h-fit">

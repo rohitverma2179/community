@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState, AppDispatch } from '../store/store';
-import { fetchPosts, addPostToFeed, setPostModalOpen } from '../store/post/post.slice';
-import { useNavigate } from 'react-router-dom';
+import { fetchPosts, addPostToFeed } from '../store/post/post.slice';
 import socket from '../utils/socket';
 import PostCard from '../component/PostCard';
 import MainLayout from '../component/MainLayout';
