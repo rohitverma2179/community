@@ -42,7 +42,7 @@ export const getPostComments = async (req: Request, res: Response): Promise<any>
     const { postId } = req.params;
     
     // Fetch all comments for this post
-    const comments = await Comment.find({ post: postId })
+    const comments = await Comment.find({ post: postId } as any)
       .populate("user", "name email")
       .sort("-createdAt");
 

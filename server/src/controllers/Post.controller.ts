@@ -70,7 +70,7 @@ export const getPosts = async (req: Request, res: Response): Promise<any> => {
 export const getUserPosts = async (req: Request, res: Response): Promise<any> => {
   try {
     const { userId } = req.params;
-    const posts = await Post.find({ user: userId })
+    const posts = await Post.find({ user: userId } as any)
       .populate("user", "name email")
       .sort("-createdAt");
 
