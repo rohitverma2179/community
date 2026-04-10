@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, CheckCircle, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, CheckCircle, ArrowRight, Eye, EyeOff, Loader2, Link } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
-import { signupUser, loginUser, googleLogin, facebookLogin } from '../store/user/user.thunk';
+import { signupUser, loginUser, googleLogin } from '../store/user/user.thunk';
+// import { signupUser, loginUser, googleLogin, facebookLogin } from '../store/user/user.thunk';
 import { clearError, resetSuccess } from '../store/user/user.slice';
 import { useGoogleLogin } from '@react-oauth/google';
 import type { AppDispatch, RootState } from '../store/store';
 import toast, { Toaster } from 'react-hot-toast';
+import logo from '../assets/eGrowth 4.svg';
 
 const AuthPage: React.FC = () => {
     const [isLogin, setIsLogin] = useState(true);
@@ -89,38 +91,38 @@ const AuthPage: React.FC = () => {
     // I will use a custom button with useGoogleLogin for better styling.
 
     return (
-        <div className="min-h-screen bg-[#F8FAFC] flex flex-col relative overflow-hidden font-outfit">
+        <div className="min-h-screen bg-[#0a0a0a] flex flex-col relative overflow-hidden font-outfit text-white">
             <Toaster position="top-center" />
 
-            {/* Background pattern */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.03] select-none">
+            {/* Background patterns - more subtle for dark mode */}
+            <div className="absolute inset-0 pointer-events-none opacity-[0.05] select-none">
                 <img src="/src/assets/Group 6.svg" className="absolute -bottom-20 -left-20 w-1/2" alt="" />
                 <img src="/src/assets/Group 6.svg" className="absolute -top-20 -right-20 w-1/2 rotate-180" alt="" />
             </div>
 
             <header className="p-8 relative z-10">
-                <img src="/src/assets/logo.png" alt="Bexex Logo" className="h-10 opacity-90" />
+                <img src={logo} alt="Bexex Logo" className="h-10 " />
             </header>
 
             <main className="flex-1 flex flex-col items-center justify-center p-6 relative z-10 -mt-10">
                 <div className="w-full max-w-[440px]">
                     <div className="flex justify-center mb-10">
-                        <div className="bg-white/60 backdrop-blur-md p-1.5 rounded-2xl shadow-sm border border-slate-100 flex gap-1">
+                        {/* <div className="bg-[#1a1a1a] backdrop-blur-md p-1.5 rounded-2xl shadow-2xl border border-[#333] flex gap-1">
                             {['Log In', 'Sign Up'].map((tab) => (
                                 <button
                                     key={tab}
                                     onClick={() => setIsLogin(tab === 'Log In')}
-                                    className={`px-8 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${isLogin === (tab === 'Log In') ? 'bg-black text-white shadow-lg' : 'text-slate-400 hover:text-slate-600'}`}
+                                    className={`px-8 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 ${isLogin === (tab === 'Log In') ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-500 hover:text-gray-300'}`}
                                 >
                                     {tab}
                                 </button>
                             ))}
-                        </div>
+                        </div> */}
                     </div>
 
                     <motion.div
                         layout
-                        className="bg-white p-10 rounded-[44px] shadow-[0_40px_80px_-16px_rgba(0,0,0,0.06)] border border-slate-50 relative overflow-hidden"
+                        className="bg-[#141414] p-10 rounded-[44px] shadow-[0_40px_80px_-16px_rgba(0,0,0,0.5)] border border-[#222] relative overflow-hidden"
                     >
                         <form className="space-y-5" onSubmit={handleSubmit}>
                             <AnimatePresence mode="popLayout">
@@ -131,42 +133,42 @@ const AuthPage: React.FC = () => {
                                         exit={{ opacity: 0, scale: 0.95 }}
                                         className="relative group"
                                     >
-                                        <User className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-black transition-colors" size={19} />
+                                        <User className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-blue-500 transition-colors" size={19} />
                                         <input
                                             name="name"
                                             value={formData.name}
                                             onChange={handleChange}
                                             type="text"
                                             placeholder="Full Name"
-                                            className="w-full bg-slate-50 border-none px-14 py-4.5 rounded-2xl outline-none focus:ring-2 focus:ring-black/5 transition-all text-slate-900 font-medium placeholder:text-slate-300"
+                                            className="w-full bg-[#0d0d0d] border border-[#222] px-14 py-4.5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all text-white font-medium placeholder:text-gray-700"
                                         />
                                     </motion.div>
                                 )}
                             </AnimatePresence>
 
                             <div className="relative group">
-                                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-black transition-colors" size={19} />
+                                <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-blue-500 transition-colors" size={19} />
                                 <input
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
                                     type="email"
                                     placeholder="Email Address"
-                                    className="w-full bg-slate-50 border-none px-14 py-4.5 rounded-2xl outline-none focus:ring-2 focus:ring-black/5 transition-all text-slate-900 font-medium placeholder:text-slate-300"
+                                    className="w-full bg-[#0d0d0d] border border-[#222] px-14 py-4.5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all text-white font-medium placeholder:text-gray-700"
                                 />
                             </div>
 
                             <div className="relative group">
-                                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-black transition-colors" size={19} />
+                                <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-blue-500 transition-colors" size={19} />
                                 <input
                                     name="password"
                                     value={formData.password}
                                     onChange={handleChange}
                                     type={showPassword ? "text" : "password"}
                                     placeholder="Password"
-                                    className="w-full bg-slate-50 border-none px-14 py-4.5 rounded-2xl outline-none focus:ring-2 focus:ring-black/5 transition-all text-slate-900 font-medium placeholder:text-slate-300"
+                                    className="w-full bg-[#0d0d0d] border border-[#222] px-14 py-4.5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all text-white font-medium placeholder:text-gray-700"
                                 />
-                                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-5 top-1/2 -translate-y-1/2 text-slate-300 hover:text-black transition-colors">
+                                <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-600 hover:text-white transition-colors">
                                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>
                             </div>
@@ -179,14 +181,14 @@ const AuthPage: React.FC = () => {
                                         exit={{ opacity: 0, scale: 0.95 }}
                                         className="relative group"
                                     >
-                                        <CheckCircle className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-black transition-colors" size={19} />
+                                        <CheckCircle className="absolute left-5 top-1/2 -translate-y-1/2 text-gray-600 group-focus-within:text-blue-500 transition-colors" size={19} />
                                         <input
                                             name="confirmPassword"
                                             value={formData.confirmPassword}
                                             onChange={handleChange}
                                             type="password"
                                             placeholder="Confirm Password"
-                                            className="w-full bg-slate-50 border-none px-14 py-4.5 rounded-2xl outline-none focus:ring-2 focus:ring-black/5 transition-all text-slate-900 font-medium placeholder:text-slate-300"
+                                            className="w-full bg-[#0d0d0d] border border-[#222] px-14 py-4.5 rounded-2xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500/50 transition-all text-white font-medium placeholder:text-gray-700"
                                         />
                                     </motion.div>
                                 )}
@@ -194,7 +196,7 @@ const AuthPage: React.FC = () => {
 
                             <button
                                 disabled={isLoading}
-                                className="w-full bg-black text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-3 hover:scale-[1.01] active:scale-[0.99] transition-all shadow-xl shadow-black/10 disabled:bg-slate-800"
+                                className="w-full bg-blue-600 text-white py-5 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-blue-500 active:scale-[0.99] transition-all shadow-xl shadow-blue-500/20 disabled:opacity-50"
                             >
                                 {isLoading ? (
                                     <Loader2 className="animate-spin" size={20} />
@@ -208,10 +210,10 @@ const AuthPage: React.FC = () => {
 
                             <div className="relative my-8">
                                 <div className="absolute inset-0 flex items-center">
-                                    <div className="w-full border-t border-slate-100"></div>
+                                    <div className="w-full border-t border-[#222]"></div>
                                 </div>
-                                <div className="relative flex justify-center text-xs uppercase">
-                                    <span className="bg-white px-4 text-slate-400 font-bold tracking-widest">Or continue with</span>
+                                <div className="relative flex justify-center text-[10px] uppercase font-bold tracking-widest">
+                                    <span className="bg-[#141414] px-4 text-gray-600">Or continue with</span>
                                 </div>
                             </div>
 
@@ -219,7 +221,7 @@ const AuthPage: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={() => loginWithGoogle()}
-                                    className="flex items-center justify-center gap-3 py-4 px-6 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-all font-semibold text-slate-600"
+                                    className="flex items-center justify-center gap-3 py-4 px-6 rounded-2xl border border-[#222] bg-[#0d0d0d] hover:bg-[#1a1a1a] transition-all font-semibold text-gray-300"
                                 >
                                     <img src="https://www.google.com/favicon.ico" className="w-5 h-5" alt="Google" />
                                     <span>Google</span>
@@ -227,7 +229,7 @@ const AuthPage: React.FC = () => {
                                 <button
                                     type="button"
                                     onClick={() => toast.error("Facebook login setup required")}
-                                    className="flex items-center justify-center gap-3 py-4 px-6 rounded-2xl border border-slate-100 hover:bg-slate-50 transition-all font-semibold text-slate-600"
+                                    className="flex items-center justify-center gap-3 py-4 px-6 rounded-2xl border border-[#222] bg-[#0d0d0d] hover:bg-[#1a1a1a] transition-all font-semibold text-gray-300"
                                 >
                                     <svg className="w-5 h-5 text-[#1877F2] fill-current" viewBox="0 0 24 24">
                                         <path d="M24 12.073C24 5.405 18.627 0 12 0S0 5.405 0 12.073C0 18.1 4.388 23.094 10.125 24V15.563H7.078V12.073H10.125V9.413c0-3.047 1.807-4.747 4.583-4.747 1.33 0 2.731.239 2.731.239v3.022h-1.542c-1.477 0-1.93.923-1.93 1.887v2.266h3.401l-.544 3.437h-2.857V24C19.612 23.094 24 18.1 24 12.073z" />
@@ -237,8 +239,8 @@ const AuthPage: React.FC = () => {
                             </div>
                         </form>
 
-                        <div className="mt-8 text-center">
-                            <button onClick={toggleAuth} className="text-sm font-medium text-slate-400 hover:text-black transition-colors">
+                        <div className="mt-8 text-center border-t border-[#222] pt-6">
+                            <button onClick={toggleAuth} className="text-sm font-medium text-gray-500 hover:text-white transition-colors">
                                 {isLogin ? "Don't have an account? Sign up" : "Already have an account? Log in"}
                             </button>
                         </div>
@@ -246,7 +248,7 @@ const AuthPage: React.FC = () => {
 
                     {error && (
                         <div className="mt-6 text-center">
-                            <p className="text-xs font-semibold text-rose-500 bg-rose-50 py-2 px-4 rounded-full inline-block">
+                            <p className="text-xs font-semibold text-rose-500 bg-rose-500/10 py-2 px-4 rounded-full inline-block border border-rose-500/20">
                                 Error: {error}
                             </p>
                         </div>
@@ -254,9 +256,9 @@ const AuthPage: React.FC = () => {
                 </div>
             </main>
 
-            <footer className="p-8 text-center text-[11px] text-slate-300 uppercase tracking-widest font-semibold">
-                &copy; 2026 Bexex Global. High Security Audit Portal
-            </footer>
+            {/* <footer className="p-8 text-center text-[10px] text-gray-700 uppercase tracking-[0.2em] font-bold">
+                &copy; 2026 Bexex Global • High Security community platform for construction professionals worldwide.
+            </footer> */}
         </div>
     );
 };

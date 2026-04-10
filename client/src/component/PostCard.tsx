@@ -47,15 +47,15 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
         };
 
         return (
-          <div className="rounded-2xl overflow-hidden border border-[#2d2d2e] bg-[#0a0a0a]">
+          <div className=" overflow-hidden ">
              {/* Image-Style Header */}
              <div className="p-4 flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                    <div className="flex flex-col">
                       <span className="text-rose-500 font-bold text-[10px] uppercase tracking-wider mb-1">PDF</span>
-                      <h5 className="text-sm font-bold text-gray-200 truncate max-w-[200px] md:max-w-md">
+                      {/* <h5 className="text-sm font-bold text-gray-200 truncate max-w-[200px] md:max-w-md">
                          {mediaUrl.split('/').pop()}
-                      </h5>
+                      </h5> */}
                    </div>
                    <div className="flex items-center gap-2">
                       <button 
@@ -110,7 +110,7 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
   };
 
   return (
-    <div className="bg-[#1a1a1a] rounded-2xl border border-[#333] overflow-hidden hover:border-[#444] transition-all group shadow-sm">
+    <div className="bg-[#262626] rounded-2xl  overflow-hidden hover:border-[#444] transition-all group shadow-sm">
       {/* Header */}
       <div className="p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -135,8 +135,8 @@ const PostCard: React.FC<PostCardProps> = ({ post }) => {
       </div>
 
       {/* Content */}
-      <div className="px-4 pb-4">
-        <p className="text-[15px] leading-relaxed mb-4 text-gray-200 whitespace-pre-wrap">{post.content}</p>
+      <div className="px-0 pb-4">
+        <p className="text-[15px] leading-relaxed mb-4 px-4 text-gray-200 whitespace-pre-wrap">{post.content}</p>
         {renderMedia()}
       </div>
 

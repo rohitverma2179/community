@@ -2,7 +2,7 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '../store/store';
 import { Search, User as UserIcon, Home, Flame, Newspaper, Briefcase, Plus, SignalLow } from 'lucide-react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 import { setPostModalOpen } from '../store/post/post.slice';
 
@@ -33,13 +33,13 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="fixed top-0 left-0 right-0 h-16 bg-[#161616] border-b border-[#222] z-50 flex items-center">
-      <div className="max-w-7xl mx-auto w-full flex items-center px-4">
+    <nav className="fixed top-0 left-0 right-0 h-16 lg:pr-15 bg-[#161616] border-b border-[#222] z-50 flex items-center">
+      <div className="max-w-[74rem] mx-auto w-full flex items-center px-4">
         {/* Brand/Logo */}
         <div className="flex items-center gap-6">
           <div className="w-10 h-10 bg-gradient-to-br  flex items-center justify-center ">
             {/* <SignalLow className="text-white rotate-90" size={24} /> */}
-            <img src={logo} alt="Logo" />
+           <Link to="/"> <img src={logo} alt="Logo" /></Link>
           </div>
         </div>
 

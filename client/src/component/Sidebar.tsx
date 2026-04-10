@@ -13,8 +13,8 @@ const Sidebar: React.FC = () => {
   const resources = ['Documentation', 'Course Material', 'Asset Library', 'Video Tutorials'];
 
   return (
-    <aside className="w-72 hidden lg:flex flex-col gap-4 sticky top-20 h-fit">
-      <div className="bg-[#1e1e1e] p-4 rounded-[20px] border border-[#333] shadow-xl">
+    <aside className="w-64 hidden lg:flex flex-col gap-4 sticky top-20 h-fit">
+      <div className="bg-[#262626] p-4 rounded-[20px] border border-[#333] shadow-xl">
         <div className="flex items-center gap-3 mb-4">
           <div className="bg-white/10 p-1.5 rounded-lg">
             <Globe size={20} className="text-white" />
@@ -26,7 +26,7 @@ const Sidebar: React.FC = () => {
           {domains.map((item, index) => (
             <button key={item} className="w-full text-left flex gap-2 group transition-all duration-300">
               <span className="text-gray-500 font-bold text-xs mt-0.5">{index + 1}.</span>
-              <span className="text-gray-400 group-hover:text-white text-sm font-medium leading-tight transition-colors">
+              <span className="text-gray-400 group-hover:text-white text-xs font-medium leading-tight transition-colors">
                 {item}
               </span>
             </button>
