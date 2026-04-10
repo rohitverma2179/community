@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MessageSquare, Heart, Share2, MoreHorizontal, FileText, ChevronLeft, ChevronRight, Download, Play, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { MessageSquare, Share2, MoreHorizontal, ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { likePost } from '../store/post/post.slice';

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import type { RootState } from '../store/store';
-import { Search, User as UserIcon, Home, Flame, Newspaper, Briefcase, Plus, SignalLow } from 'lucide-react';
+import type { RootState, AppDispatch } from '../store/store';
+import { Search, User as UserIcon, Home, Flame, Newspaper, Briefcase, Plus } from 'lucide-react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 import { setPostModalOpen } from '../store/post/post.slice';
@@ -12,7 +12,7 @@ import logo from '../assets/eGrowth 4.svg';
 
 const Navbar: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.user);
-  const dispatch = useDispatch <AppDispatch>();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const location = useLocation();
   const [isHovered, setIsHovered] = React.useState(false);
@@ -146,5 +146,7 @@ const Navbar: React.FC = () => {
     </nav>
   );
 };
+
+
 
 export default Navbar;

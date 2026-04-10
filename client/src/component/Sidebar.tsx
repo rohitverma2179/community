@@ -1,5 +1,5 @@
 import React from 'react';
-import { Globe, BookOpen, Link, Star, Home, ChevronDown, ChevronRight, FileText, Image, FileSpreadsheet } from 'lucide-react';
+import { Globe, Star, Home, ChevronDown, ChevronRight, FileText, Image, FileSpreadsheet } from 'lucide-react';
 
 const Sidebar: React.FC = () => {
   const domains = [

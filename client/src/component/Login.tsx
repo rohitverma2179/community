@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, CheckCircle, ArrowRight, Eye, EyeOff, Loader2, Link } from 'lucide-react';
+import { Mail, Lock, User, CheckCircle, ArrowRight, Eye, EyeOff, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useDispatch, useSelector } from 'react-redux';
 import { signupUser, loginUser, googleLogin } from '../store/user/user.thunk';
