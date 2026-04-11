@@ -143,7 +143,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, postUrl, postT
               </button>
             </div>
 
-            <div className="p-6">
+            <div className="p-6">      
               {imageUrl && (
                 <div className="mb-6 rounded-2xl overflow-hidden h-32 w-full border border-[#333] relative group">
                    <img src={imageUrl} alt="Post" className="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity" />
