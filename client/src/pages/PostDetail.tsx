@@ -94,7 +94,7 @@ const PostDetail: React.FC = () => {
                     <Loader2 className="animate-spin text-blue-500" size={32} />
                 </div>
             ) : (
-                post && <PostCard post={post} />
+                post && <PostCard post={post} isDetailed={true} />
             )}
 
             <div className="mt-8 bg-[#1a1a1a] rounded-2xl border border-[#333] p-6 mb-10 text-justify">

@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance';
 
-const API_URL = 'http://localhost:3000/api/comments';
+const API_URL = '/comments';
 
 export const fetchPostComments = createAsyncThunk('comment/fetchPostComments', async (postId: string) => {
-  const response = await axios.get(`${API_URL}/post/${postId}`);
+  const response = await axiosInstance.get(`${API_URL}/post/${postId}`);
   return response.data.data.comments;
 });
 
 export const addComment = createAsyncThunk('comment/addComment', async (commentData: { content: string; postId: string; parentCommentId?: string }) => {
-  const response = await axios.post(API_URL, commentData, { withCredentials: true });
+  const response = await axiosInstance.post(API_URL, commentData);
   return response.data.data.comment;
 });
 
@@ -26,7 +26,7 @@ const initialState: CommentState = {
 };
 
 export const likeComment = createAsyncThunk('comment/likeComment', async (commentId: string) => {
-  const response = await axios.post(`${API_URL}/${commentId}/like`, {}, { withCredentials: true });
+  const response = await axiosInstance.post(`${API_URL}/${commentId}/like`, {});
   return { commentId, likes: response.data.data.likes };
 });
 

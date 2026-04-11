@@ -1,10 +1,10 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
-import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance';
 
-const API_URL = 'http://localhost:3000/api/posts';
+const API_URL = '/posts';
 
 export const fetchPosts = createAsyncThunk('post/fetchPosts', async () => {
-  const response = await axios.get(API_URL);
+  const response = await axiosInstance.get(API_URL);
   return response.data.data.posts;
 });
 
@@ -12,7 +12,7 @@ export const createPost = createAsyncThunk(
   'post/createPost',
   async (postData: { content: string; images?: string[] }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(API_URL, postData, { withCredentials: true });
+      const response = await axiosInstance.post(API_URL, postData);
       return response.data.data.post;
     } catch (error: any) {
       return rejectWithValue(error.response?.data?.message || 'Failed to create post');
@@ -21,12 +21,12 @@ export const createPost = createAsyncThunk(
 );
 
 export const fetchUserPosts = createAsyncThunk('post/fetchUserPosts', async (userId: string) => {
-  const response = await axios.get(`${API_URL}/user/${userId}`);
+  const response = await axiosInstance.get(`${API_URL}/user/${userId}`);
   return response.data.data.posts;
 });
 
 export const fetchPostById = createAsyncThunk('post/fetchPostById', async (postId: string) => {
-  const response = await axios.get(`${API_URL}/${postId}`);
+  const response = await axiosInstance.get(`${API_URL}/${postId}`);
   return response.data.data.post;
 });
 
@@ -47,7 +47,7 @@ const initialState: PostState = {
 };
 
 export const likePost = createAsyncThunk('post/likePost', async (postId: string) => {
-  const response = await axios.post(`${API_URL}/${postId}/like`, {}, { withCredentials: true });
+  const response = await axiosInstance.post(`${API_URL}/${postId}/like`, {});
   return { postId, likes: response.data.data.likes };
 });
 
