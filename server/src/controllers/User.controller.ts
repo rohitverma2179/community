@@ -33,6 +33,8 @@ const createSendToken = (user: IUser, statusCode: number, res: Response) => {
   });
 };
 
+
+
 export const signup = async (req: Request, res: Response): Promise<any> => {
   try {
     const { name, email, password, confirmPassword } = req.body;
@@ -76,7 +78,7 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
 
     try {
       await sendEmail({
-        email: newUser.email,
+        email: (newUser as any).email,
         subject: "Verify your email - Bexex Global",
         message,
       });
@@ -94,7 +96,7 @@ export const signup = async (req: Request, res: Response): Promise<any> => {
           dev_error: err.message
         });
       }
-      await User.findByIdAndDelete(newUser._id);
+      await User.findByIdAndDelete((newUser as any)._id);
       return res.status(500).json({ status: "error", message: "Error sending verification email. Try again." });
     }
   } catch (error: any) {
@@ -130,6 +132,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
   }
 };
 
+
 export const verifyEmail = async (req: Request, res: Response): Promise<any> => {
   try {
     const { token } = req.params;
@@ -163,9 +166,9 @@ export const googleLogin = async (req: Request, res: Response): Promise<any> => 
     if (credential) {
       const ticket = await client.verifyIdToken({
         idToken: credential,
-        audience: process.env.GOOGLE_CLIENT_ID,
+        audience: process.env.GOOGLE_CLIENT_ID as string,
       });
-      const payload = ticket.getPayload();
+      const payload = (ticket as any).getPayload();
       if (!payload) return res.status(400).json({ status: "fail", message: "Invalid Google token" });
       email = payload.email;
       name = payload.name;
