@@ -6,7 +6,8 @@ let io: Server;
 export const initSocket = (server: http.Server) => {
   io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      // origin: "http://localhost:5173",
+       origin: "https://community-chi-eight.vercel.app", 
       methods: ["GET", "POST"],
     },
   });
