@@ -24,7 +24,7 @@ const AdsSidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-64 hidden xl:flex flex-col gap-6 sticky top-20 h-fit">
+    <aside className="w-[223px] hidden xl:flex flex-col gap-6 sticky top-20 h-fit">
       <h3 className="text-gray-500 text-xs font-bold uppercase tracking-widest px-2">Sponsored</h3>
       {ads.map((ad, index) => (
         <div key={index} className="bg-[#1a1a1a] rounded-2xl overflow-hidden border border-[#333] hover:border-[#444] transition-colors group cursor-pointer shadow-lg shadow-black/20">

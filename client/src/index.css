@@ -1,10 +1,12 @@
 @import "tailwindcss";
 
-@theme {
-  --font-outfit: "Outfit", sans-serif;
-}
+/* ✅ Google Font (Inter) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+/* ✅ Set Inter as default font in Tailwind theme */
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
 
 :root {
   --bg-primary: #0a0a0a;
@@ -17,14 +19,15 @@
   --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-
+/* ✅ Apply Inter globally */
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans);
   background-color: var(--bg-primary);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
 }
 
+/* UI helpers */
 .glass {
   background: rgba(26, 26, 26, 0.8);
   backdrop-filter: blur(12px);
@@ -44,4 +47,3 @@ body {
 #root {
   min-height: 100vh;
 }
-
