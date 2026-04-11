@@ -1,8 +1,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  // baseURL: import.meta.env.VITE_API_URL || "https://community-qypx.vercel.app/api",
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",  // --- IGNORE ---
+  baseURL: import.meta.env.VITE_API_URL || "https://community-qypx.vercel.app/api",
+  // baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",  // --- IGNORE ---
   withCredentials: true,
   headers: {
     "Content-Type": "application/json",
