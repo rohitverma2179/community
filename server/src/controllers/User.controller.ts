@@ -33,6 +33,8 @@ const createSendToken = (user: IUser, statusCode: number, res: Response) => {
   });
 };
 
+
+
 export const signup = async (req: Request, res: Response): Promise<any> => {
   try {
     const { name, email, password, confirmPassword } = req.body;
@@ -129,6 +131,7 @@ export const login = async (req: Request, res: Response): Promise<any> => {
     res.status(500).json({ status: "error", message: error.message });
   }
 };
+
 
 export const verifyEmail = async (req: Request, res: Response): Promise<any> => {
   try {
