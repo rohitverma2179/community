@@ -8,9 +8,11 @@ import { setPostModalOpen } from '../store/post/post.slice';
 import type { RootState, AppDispatch } from '../store/store';
 
 interface MainLayoutProps {
-  children: React.ReactNode;
+  children: React.ReactNode;  
 }
 
+
+// update
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const dispatch = useDispatch<AppDispatch>();
   const { isPostModalOpen } = useSelector((state: RootState) => state.post);
