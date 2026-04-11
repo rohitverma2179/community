@@ -35,6 +35,9 @@ const createSendToken = (user: IUser, statusCode: number, res: Response) => {
 
 
 
+
+
+
 export const signup = async (req: Request, res: Response): Promise<any> => {
   try {
     const { name, email, password, confirmPassword } = req.body;
@@ -96,11 +99,12 @@ export const verifyOTP = async (req: Request, res: Response): Promise<any> => {
     }
 
     user.isVerified = true;
-    user.otp = undefined;
-    user.otpExpires = undefined;
 
-    await user.save();
+// ✅ FIXED CODE
+(user as any).otp = undefined;
+(user as any).otpExpires = undefined;
 
+await user.save();
     // ✅ Auto login after verify
     createSendToken(user, 200, res);
 
