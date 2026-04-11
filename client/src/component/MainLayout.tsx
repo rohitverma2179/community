@@ -19,7 +19,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       <Navbar />
 
-      <main className="max-w-[1250px] mx-auto px-4 pt-20 flex gap-6">
+      <main className="max-w-[1250px] mx-auto px-4 pt-20 flex gap-6">    
         {/* Left Sidebar - Navigation */}
         <Sidebar />
 
