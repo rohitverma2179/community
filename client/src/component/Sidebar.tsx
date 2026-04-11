@@ -1,5 +1,5 @@
 import React from 'react';
-import { Globe, ChevronDown, ChevronRight, FileText, Image, FileSpreadsheet } from 'lucide-react';
+import { Globe, ChevronDown, ChevronRight } from 'lucide-react';
 import pdf from '../assets/icons/pdf.svg';
 import doc from '../assets/icons/document.svg';
 import excel from '../assets/icons/excel.svg';

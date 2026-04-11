@@ -154,7 +154,7 @@ const ShareModal: React.FC<ShareModalProps> = ({ isOpen, onClose, postUrl, postT
               )}
 
               <div className="flex overflow-x-auto gap-4 pb-4 no-scrollbar">
-                {navigator.share && (
+                {typeof navigator !== "undefined" && "share" in navigator && (
                    <button
                     onClick={handleNativeShare}
                     disabled={isSharing}
