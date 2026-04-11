@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
 
-const API_URL = 'http://localhost:3000/api/posts';
+const API_URL = 'https://community-qypx.vercel.app/api/posts';
 
 export const fetchPosts = createAsyncThunk('post/fetchPosts', async () => {
   const response = await axios.get(API_URL);
