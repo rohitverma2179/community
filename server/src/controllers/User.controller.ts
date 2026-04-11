@@ -33,83 +33,72 @@ const createSendToken = (user: IUser, statusCode: number, res: Response) => {
   });
 };
 
-
-
-
-
-
 export const signup = async (req: Request, res: Response): Promise<any> => {
   try {
     const { name, email, password, confirmPassword } = req.body;
 
+    // 1) Validation Checks
     if (!name || !email || !password || !confirmPassword) {
-      return res.status(400).json({ message: "All fields required" });
+      return res.status(400).json({ status: "fail", message: "All fields are required" });
     }
-
+    if (!validator.isEmail(email)) {
+      return res.status(400).json({ status: "fail", message: "Invalid email address" });
+    }
     if (password !== confirmPassword) {
-      return res.status(400).json({ message: "Passwords do not match" });
+      return res.status(400).json({ status: "fail", message: "Passwords do not match" });
+    }
+    if (password.length < 8) {
+      return res.status(400).json({ status: "fail", message: "Password must be at least 8 characters" });
     }
 
+    // 2) Check if user exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "Email already exists" });
+      return res.status(400).json({ status: "fail", message: "Email already registered" });
     }
 
-    // ✅ OTP generate
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpires = new Date(Date.now() + 10 * 60 * 1000);
+    // 3) Create verification token
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+    const verificationTokenExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
-    const user = await User.create({
+    // 4) Save User
+    const newUser = await User.create({
       name,
       email,
       password,
-      otp,
-      otpExpires,
-      isVerified: false,
+      verificationToken,
+      verificationTokenExpires,
     });
 
-    await sendEmail({
-      email,
-      subject: "Your OTP Code",
-      message: `Your OTP is: ${otp}`,
-    });
+    // 5) Send Verification Email
+    const verificationURL = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
+    const message = `Please verify your email by clicking the link: ${verificationURL}`;
 
-    res.status(201).json({
-      status: "success",
-      message: "OTP sent to email",
-    });
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
-  }
-};
+    try {
+      await sendEmail({
+        email: newUser.email,
+        subject: "Verify your email - Bexex Global",
+        message,
+      });
 
-
-export const verifyOTP = async (req: Request, res: Response): Promise<any> => {
-  try {
-    const { email, otp } = req.body;
-
-    const user = await User.findOne({
-      email,
-      otp,
-      otpExpires: { $gt: new Date() },
-    });
-
-    if (!user) {
-      return res.status(400).json({ message: "Invalid or expired OTP" });
+      res.status(201).json({
+        status: "success",
+        message: "Signup successful! Check your email to verify your account.",
+      });
+    } catch (err: any) {
+      // ✅ FIX for 500 Error: If email fail, don't crash. Still allow signup in Dev mode.
+      if (process.env.NODE_ENV !== 'production') {
+        return res.status(201).json({
+          status: "success",
+          message: "Signup successful, BUT EMAIL FAILED TO SEND. check your server console for errors.",
+          dev_error: err.message
+        });
+      }
+      await User.findByIdAndDelete(newUser._id);
+      return res.status(500).json({ status: "error", message: "Error sending verification email. Try again." });
     }
-
-    user.isVerified = true;
-
-// ✅ FIXED CODE
-(user as any).otp = undefined;
-(user as any).otpExpires = undefined;
-
-await user.save();
-    // ✅ Auto login after verify
-    createSendToken(user, 200, res);
-
-  } catch (err: any) {
-    res.status(500).json({ message: err.message });
+  } catch (error: any) {
+    res.status(500).json({ status: "error", message: error.message });
   }
 };
 
@@ -140,7 +129,6 @@ export const login = async (req: Request, res: Response): Promise<any> => {
     res.status(500).json({ status: "error", message: error.message });
   }
 };
-
 
 export const verifyEmail = async (req: Request, res: Response): Promise<any> => {
   try {
@@ -175,9 +163,9 @@ export const googleLogin = async (req: Request, res: Response): Promise<any> => 
     if (credential) {
       const ticket = await client.verifyIdToken({
         idToken: credential,
-        audience: process.env.GOOGLE_CLIENT_ID as string,
+        audience: process.env.GOOGLE_CLIENT_ID,
       });
-      const payload = (ticket as any).getPayload();
+      const payload = ticket.getPayload();
       if (!payload) return res.status(400).json({ status: "fail", message: "Invalid Google token" });
       email = payload.email;
       name = payload.name;
