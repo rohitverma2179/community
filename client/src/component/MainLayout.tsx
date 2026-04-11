@@ -16,10 +16,10 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   const { isPostModalOpen } = useSelector((state: RootState) => state.post);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-white">
+    <div className="min-h-screen bg-[#181818] text-white flex justify-center">
       <Navbar />
 
-      <main className="max-w-[1250px] mx-auto px-4 pt-20 flex gap-6">    
+      <main className="max-w-6xl mx-auto px-4 pt-20 flex gap-6">    
         {/* Left Sidebar - Navigation */}
         <Sidebar />
 

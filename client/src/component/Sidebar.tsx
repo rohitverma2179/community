@@ -1,5 +1,9 @@
 import React from 'react';
 import { Globe, ChevronDown, ChevronRight, FileText, Image, FileSpreadsheet } from 'lucide-react';
+import pdf from '../assets/icons/pdf.svg';
+import doc from '../assets/icons/document.svg';
+import excel from '../assets/icons/excel.svg';
+import jpeg from '../assets/icons/jpeg.svg';
 
 const Sidebar: React.FC = () => {
   const domains = [
@@ -12,10 +16,10 @@ const Sidebar: React.FC = () => {
   ];
 
   return (
-    <aside className="w-64 hidden lg:flex flex-col gap-4 sticky top-20 h-fit">
+    <aside className="w-[223px] hidden lg:flex flex-col gap-4 sticky top-20 h-fit">
       <div className="bg-[#262626] p-4 rounded-[20px] border border-[#333] shadow-xl">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="bg-white/10 p-1.5 rounded-lg">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="p-1.5">
             <Globe size={20} className="text-white" />
           </div>
           <h3 className="text-lg font-bold text-white tracking-tight">Domains</h3>
@@ -24,8 +28,8 @@ const Sidebar: React.FC = () => {
         <div className="space-y-3">
           {domains.map((item, index) => (
             <button key={item} className="w-full text-left flex gap-2 group transition-all duration-300">
-              <span className="text-gray-500 font-bold text-xs mt-0.5">{index + 1}.</span>
-              <span className="text-gray-400 group-hover:text-white text-xs font-medium leading-tight transition-colors">
+              <span className="text-[#8BA2AD] font-medium text-xs mt-0.5">{index + 1}.</span>
+              <span className="text-[#8BA2AD] group-hover:text-white text-xs font-medium leading-tight transition-colors">
                 {item}
               </span>
             </button>
@@ -34,27 +38,27 @@ const Sidebar: React.FC = () => {
       </div>
 
 
-      <div className="bg-[#1e1e1e] p-4 rounded-[20px] border border-[#333] shadow-xl">
+      <div className="bg-[#262626] p-4 rounded-[20px] border border-[#333] shadow-xl">
         <div className="flex items-center justify-between mb-4 px-1">
-          <h3 className="text-md font-bold text-gray-400">Resources</h3>
-          <ChevronDown size={16} className="text-gray-500" />
+          <h3 className="text-[14px] font-normal text-[#8BA2AD]">Resources</h3>
+          <ChevronDown size={16} className="text-[#8BA2AD]" />
         </div>
         
         <div className="space-y-3">
           {[
-            { name: 'PDF', icon: <FileText size={20} />, color: 'text-rose-500', bg: 'bg-rose-500/10' },
-            { name: 'Documents', icon: <FileText size={20} />, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
-            { name: 'jpeg', icon: <Image size={20} />, color: 'text-pink-500', bg: 'bg-pink-500/10' },
-            { name: 'Excel', icon: <FileSpreadsheet size={20} />, color: 'text-green-500', bg: 'bg-green-500/10' },
+            { name: 'PDF', icon: <img src={pdf} alt="PDF" className="w-6 h-6" /> },
+            { name: 'Documents', icon: <img src={doc} alt="Documents" className="w-6 h-6" /> },
+            { name: 'jpeg', icon: <img src={jpeg} alt="jpeg" className="w-6 h-6" />},
+            { name: 'Excel', icon: <img src={excel} alt="Excel" className="w-6 h-6" />},
           ].map((item) => (
             <button key={item.name} className="w-full flex items-center justify-between group py-0.5 hover:translate-x-1 transition-all">
               <div className="flex items-center gap-3">
-                <div className={`${item.bg} p-2 rounded-lg border border-white/5 ${item.color}`}>
+                <div className="p-2">
                   {item.icon}
                 </div>
-                <span className="text-white font-bold text-md">{item.name}</span>
+                <span className="text-white font-medium text-md">{item.name}</span>
               </div>
-              <ChevronRight size={16} className="text-gray-600 group-hover:text-white transition-colors" />
+              <ChevronRight size={16} className="text-[#8BA2AD] group-hover:text-white transition-colors" />
             </button>
           ))}
         </div>
