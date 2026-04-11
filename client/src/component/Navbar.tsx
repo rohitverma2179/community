@@ -137,7 +137,7 @@ const Navbar: React.FC = () => {
               </div>
             )}
           </div>
-
+ 
           {/* Dropdown */}
           <AnimatePresence>
             {isHovered && (
