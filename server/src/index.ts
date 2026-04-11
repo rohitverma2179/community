@@ -23,8 +23,8 @@ await connectDB();
 // Middleware
 app.use(cors({
 
-  // origin: "https://community-chi-eight.vercel.app", // Allow your React app's origin
-  origin: "https://testing.bexex.in", // Allow your React app's origin
+  origin: "https://community-chi-eight.vercel.app", // Allow your React app's origin
+  // origin: "https://testing.bexex.in", // Allow your React app's origin
   // origin: "http://localhost:5173", // Allow your React app's origin
   credentials: true,               // Allow cookies to be sent
 }));
